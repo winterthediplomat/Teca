@@ -34,6 +34,7 @@ fullbody_template = string.Template("""<html>
     </script>
 </head>
 <body>
+    <a href='../index.html'>Back to $upper_folder</a>
     <div id="folders"><ul>$folders</ul></div>
     <div id="images"><ul>$images</ul></div>
     <footer>You know what's cool? Lukhash and teca.py are cool!
@@ -75,7 +76,8 @@ def generateIndex(path, files, dirs):
     index_file = open(os.path.join(path, "index.html"), "w")
     template_params = {'path': path,
                        'images': '',
-                       'folders': ''}
+                       'folders': '',
+                       'upper_folder': os.path.dirname(path)}
 
     #let's see if path has a cool name
     try:
@@ -91,6 +93,7 @@ def generateIndex(path, files, dirs):
             cool_folder_name = kool_neims[dir_]
         except KeyError:
             cool_folder_name = dir_.replace('_', ' ').capitalize()
+
         template_params['folders'] += folder_template.safe_substitute(
                                 link_to_folder="%s" % (dir_),
                                 folder_name=cool_folder_name)
