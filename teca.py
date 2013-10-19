@@ -74,10 +74,17 @@ def generateIndex(path, files, dirs):
     """
     #preparing the index
     index_file = open(os.path.join(path, "index.html"), "w")
+
     template_params = {'path': path,
                        'images': '',
                        'folders': '',
-                       'upper_folder': os.path.split(path)[0]}
+                       'upper_folder': ''}
+    
+    #making upper folder right.
+    head, tail = os.path.split(path)
+    if tail == '':
+        head = (os.path.sep).join(head.split(os.path.sep)[:-1])
+    template_params['upper_folder'] = head
 
     #let's see if path has a cool name
     try:
