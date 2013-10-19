@@ -77,7 +77,7 @@ def generateIndex(path, files, dirs):
     template_params = {'path': path,
                        'images': '',
                        'folders': '',
-                       'upper_folder': os.path.dirname(path)}
+                       'upper_folder': os.path.split(path)[0]}
 
     #let's see if path has a cool name
     try:
