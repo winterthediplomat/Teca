@@ -1,18 +1,26 @@
 #-*- coding:utf8 -*-
 
 import os
-import sys
 import re
 import json
+from optparse import OptionParser
 
 
 class ConfigHandler(object):
 
-    def __init__(self, config_json_path=None):
+    def __init__(self, config_json_path=None, options_from_cmd=None):
         if config_json_path:
             self.config = json.load(open(config_json_path))
         else:
             self.config = dict()
+        if options_from_cmd:
+            self.cmd_config = options_from_cmd
+        else:
+            self.cmd_config = dict()
+
+    @property
+    def use_verbose(self):
+        return self.cmd_config["verbose"]
 
     @property
     def image_formats(self):
@@ -39,7 +47,11 @@ class ConfigHandler(object):
         """
         return self._get_obj_from_path(path)["title"]
 
-    def physical_path(self, path):
+    def image_prefix_path(self, path):
+        """
+        fool idea: allowing links on other sites.
+        it's transparent for the end user.
+        """
         return self._get_obj_from_path(path)["fspath"]
 
 
@@ -59,18 +71,37 @@ def generateIndex(path, files, dirs):
 
 
 def goDeeper(starting_path, cfg):
-    for root, dirs, files in os.walk(starting_path, topdown=True):
-        files[:] = filterImages(files)
+    for actual_dir, dirs, files in os.walk(starting_path, topdown=True):
+        if cfg.use_verbose:
+            print(('walking into directory: ', actual_dir))
+        files[:] = [f for f in filterImages(files)
+                         if f not in cfg.excluded_files(actual_dir)]
         #won't walk into some "excluded paths" (if needed)
         dirs[:] = [d for d in dirs if d not in cfg.excluded_folders]
+        if cfg.use_verbose:
+            print('now generating index...')
+        generateIndex(actual_dir, files, dirs)
 
-        generateIndex(root, files, dirs)
+
+def handleCmd():
+    parser = OptionParser()
+    parser.add_option('-c', '--config',
+             dest='cfgpath',
+             default='./cfg.json',
+             help='the path of the configuration file'
+        )
+    parser.add_option('-v', '--verbose',
+             default=False,
+             help='useful for logging and debugging.'
+        )
+    (options, args) = parser.parse_args()
+    return {
+        "cfgpath": options.cfgpath,
+        "verbose": options.verbose,
+        "starting_path": args[0]
+        }
 
 if __name__ == "__main__":
-    spath = sys.argv[1]
-    try:
-        cfgpath = sys.argv[2]
-    except IndexError:
-        cfgpath = './cfg.json'
-    cfghandler = ConfigHandler(cfgpath)
-    goDeeper(spath, cfghandler)
+    options = handleCmd()
+    cfghandler = ConfigHandler(options['cfgpath'], options)
+    goDeeper(options['starting_path'], cfghandler)
