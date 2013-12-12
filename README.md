@@ -1,7 +1,7 @@
 Teca
 ====
 
-A simple static image gallery generator.
+A simple static -and configurable- image gallery generator.
 
 Installation and Usage
 ===
@@ -20,3 +20,17 @@ cd $screenshot_folder
 sh clean.sh
 echo "Thank you for using Teca"
 ```
+
+Dependencies
+===
+* Jinja2 (from the Cheese Shop)
+* optparse (stdlib)
+
+TODO
+===
+Teca will be rebuilt, keeping in mind that
+Jinja2 will be in charge of the generation of the html.
+
+also, Teca will have some cool command-line features.
+Configuration files will be written in JSON: Python has a parser
+in the stdlib, so KISS and JSON ^_^
