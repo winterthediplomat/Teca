@@ -1,0 +1,45 @@
+<html>
+<head>
+  <title>{{title}} - Teca</title>
+</head>
+<body>
+  <div>{{title}}</div>
+  <div id='dirs'>
+    <div id='backdirectory'>
+       <a href='{{back_folder}}/index.html'>Back to upper folder</a>
+    </div>
+  	<table>
+  	<tr>
+  	{% for dirname in dirs %}
+      <td>
+        <a href='{{dirname}}/index.html'>
+          <img {#height='{{cover_height}}' width='{{cover_width}}'#} src='{{dirname}}/cover_.png' />
+        </a>
+        <br />
+        <a href='{{dirname}}/index.html'>{{dirname}}</a>
+      </td>
+      {% if loop.index is divisibleby dirs_no %}
+      </tr>
+      <tr>
+      {% endif %}
+     {% endfor %}
+     </tr>
+    </table>
+  </div>
+  <div id='files'>
+    <table>
+    <tr>
+    {% for filename in files %}
+      <td>
+        <a href='{{filename}}'><img src='thumb_{{filename}}' /></a>
+      </td>
+      {% if loop.index is divisibleby images_no %}
+      </tr>
+      <tr>
+      {% endif %}
+    {% endfor %}
+    </tr>
+    </table>
+  </div>
+</body>
+</html>
