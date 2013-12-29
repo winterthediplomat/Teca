@@ -1,5 +1,7 @@
 {
     "paths":{
+        "excluded_folders": ["testfolder"],
+        "excluded_files":["dati_team_bitbucket.png"],
         "anime_screens":{
             "title": "Anime Screens",
             "excluded_folders": [],
@@ -42,7 +44,7 @@
         "width": 640,
         "height": 400
     },
-    "regenerate_thumbnails": true,
+    "regenerate_thumbnails": false,
     "directories_on_a_row": 3,
     "images_on_a_row": 3
 }

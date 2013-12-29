@@ -33,12 +33,19 @@ See Configuration.md file for every information you may need.
 Dependencies
 ===
 * Jinja2 (from the Cheese Shop or github)
-* PIL (from the PythonWare site)
+* Pillow (from the Cheese Shop or github)
 * optparse (stdlib)
 
-I didn't try (Pillow)[https://github.com/python-imaging/Pillow], probably it could be a better option.
-PIL is needed only for thumbnails: probably it's an overkill, even ImageMagick could be OK for this.
-Duh, I'll investigate.
+30 dec 2013: officially switched to Pillow
+```
+<Robertof> alfateam123
+<Robertof> :: Vuoi sostituire python2-imaging con community/python2-pillow? [S/n] s
+<Robertof> io faccio y
+<alfateam123> Robertof: massì, prova
+<alfateam123> sostituisci
+<Robertof> già fatto alfateam123 
+<alfateam123> lol
+```
 
 TODO
 ===

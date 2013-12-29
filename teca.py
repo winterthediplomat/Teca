@@ -8,7 +8,7 @@ import random
 from optparse import OptionParser
 #external libraries
 import jinja2
-import Image
+from PIL import Image
 
 
 
@@ -18,6 +18,7 @@ class ConfigHandler(object):
         if config_json_path:
             self.config = json.load(open(config_json_path))
         else:
+            B
             self.config = {
                 "image_formats":[
                     "jpg", "tiff", "png", "bmp"
@@ -165,10 +166,17 @@ def generateThumbnails(path, files, cfg):
     for filename in files:
         full_filename = os.path.join(path, filename)
         if not cfg.regenerate_thumbnails and os.path.exists(os.path.join(path, "thumb_"+filename)):
+            if cfg.use_verbose:
+                print("not generated the thumbnail for %s"%full_filename)
             continue
-        thumbnail_obj = Image.open(full_filename)
-        thumbnail_obj.thumbnail(cfg.thumbnail_size(path))
-        thumbnail_obj.save(os.path.join(path, "thumb_"+filename))
+        if cfg.use_verbose:
+            print("generating thumbnail for %s"%full_filename)
+        try:
+            thumbnail_obj = Image.open(full_filename)
+            thumbnail_obj.thumbnail(cfg.thumbnail_size(path))
+            thumbnail_obj.save(os.path.join(path, "thumb_"+filename))
+        except:
+            print("[ERROR][Thumbnails]: error while generating thumbnail for %s"%full_filename)
 
 
 def generateIndex(path, files, dirs, cfg):
