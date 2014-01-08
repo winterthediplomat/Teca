@@ -2,25 +2,23 @@
     "paths":{
         "excluded_folders": ["testfolder"],
         "excluded_files":["dati_team_bitbucket.png"],
-        "anime_screens":{
-            "title": "Anime Screens",
-            "excluded_folders": [],
-            "excluded_files": [],
-            "bakemonogatari":{
-                "title": "Bakemonogatari (aka: la miglior serie di sempre)",
+        "paths":{
+            "anime_screens":{
+                "title": "Anime Screens",
                 "excluded_folders": [],
                 "excluded_files": [],
-                "cover_image": "vlcsnap-2013-03-13-07h36m38s219.png"
-            },
-            "fight Ippatsu! Juuden-chan":{
-                "title": "fight Ippatsu! Juuden-chan",
-                "excluded_folders": [],
-                "excluded_files": [],
-                "gingitsune":{
-                    "title": "Gingitsune",
-                    "excluded_folders": [],
-                    "excluded_files": [],
-                    "cover_image": "[Aozora] Gingitsune - 05 [720p x264-AAC][Hi10P][91C80E3C].mkv_snapshot_13.03_[2013.11.26_23.16.32].png"
+                "paths": {
+                    "bakemonogatari" :{
+                        "title": "Bakemonogatari (aka: la miglior serie di sempre)",
+                        "cover_image": "vlcsnap-2013-03-13-07h36m38s219.png"
+                    },
+                    "fight Ippatsu! Juuden-chan":{
+                        "paths":{
+                            "gingitsune":{
+                                "cover_image": "[Aozora] Gingitsune - 05 [720p x264-AAC][Hi10P][91C80E3C].mkv_snapshot_13.03_[2013.11.26_23.16.32].png"
+                            }
+                        }
+                    }
                 }
             }
         }

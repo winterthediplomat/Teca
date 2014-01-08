@@ -1,4 +1,4 @@
-#-*- coding:utf8 -*-
+# -*- coding: utf-8 -*-
 
 #stdlib
 import os
@@ -8,8 +8,18 @@ import random
 from optparse import OptionParser
 #external libraries
 import jinja2
-from PIL import Image
 
+#fuckin' trick for UTF-8. That's the reason I flied away from Python a long time ago.
+import sys
+reload(sys) #adds setdefaultencoding in the available attributes
+sys.setdefaultencoding('utf-8')
+
+try:
+    #let's try Pillow
+    from PIL import Image
+except ImportError:
+    #not Pillow => you're using PIL
+    import Image 
 
 
 class ConfigHandler(object):
@@ -18,7 +28,6 @@ class ConfigHandler(object):
         if config_json_path:
             self.config = json.load(open(config_json_path))
         else:
-            B
             self.config = {
                 "image_formats":[
                     "jpg", "tiff", "png", "bmp"
@@ -41,11 +50,17 @@ class ConfigHandler(object):
 
     #@property
     def excluded_folders(self, path):
-        return self._get_obj_from_path(path)["excluded_folders"]
+        try:
+            return self._get_obj_from_path(path)["excluded_folders"]
+        except KeyError:
+            return list()
 
     #@property
     def excluded_files(self, path):
-        return self._get_obj_from_path(path)["excluded_files"]
+        try:
+            return self._get_obj_from_path(path)["excluded_files"]
+        except KeyError:
+            return list()
 
     def excluded_file_formats(self, filename):
         return any(
@@ -67,13 +82,9 @@ class ConfigHandler(object):
         obj_from_path = self.config["paths"]
         try:
             for subpath in filter(bool, path.split(os.path.sep)):
-                obj_from_path = obj_from_path[subpath]
-        except KeyError: #we give a default
-            obj_from_path = {
-                "title": filter(bool, path.split(os.path.sep))[-1].capitalize(),
-                "excluded_folders": [],
-                "excluded_files": []
-            }
+                obj_from_path = obj_from_path["paths"][subpath]
+        except KeyError:
+            obj_from_path = dict()
         return obj_from_path
 
     #@property
@@ -85,13 +96,17 @@ class ConfigHandler(object):
         > "anime/yahari"
         > "games/ff14"
         """
-        return self._get_obj_from_path(path)["title"]
+        try:
+            return self._get_obj_from_path(path)["title"]
+        except KeyError:
+            #doing some fast modification to folder name, using it as a default
+            return path.split(os.path.sep)[-1].replace("_", " ").capitalize()
 
     def cover_image_name(self, path):
         try:
             return self._get_obj_from_path(path)["cover_image"]
         except KeyError:
-            return ":random" #":" sign in a filename is not allowed in the major filesystems.
+            return ":random" #":" symbol in a filename is not allowed in the major filesystems.
 
     def thumbnail_size(self, path):
         try:
@@ -122,10 +137,12 @@ class ConfigHandler(object):
     def regenerate_thumbnails(self):
         return self.config["regenerate_thumbnails"]
     
+    def template_path(self, path):
+        try:
+            self._get_obj_from_path(path)["template_path"]
+        except KeyError:
+            return self.config["template_path"]
 
-    @property
-    def template_path(self):
-        return self.config["template_path"]
 
     @property
     def directories_on_a_row(self):
@@ -188,9 +205,10 @@ def generateIndex(path, files, dirs, cfg):
         print("directories: "+"\n\t".join(dirs))
         print("files: "+"\n\tinserted: ".join(files))
 
-    open(os.path.join(path, "index.html"), "w").write(
+    import codecs    
+    codecs.open(os.path.join(path, "index.html"), "w", encoding = 'utf-8').write(
             jinja2.Template(
-            open(cfg.template_path).read()
+            open(cfg.template_path(path)).read()
                 ).render(
                 title = cfg.title(path),
                 files = files,
@@ -202,16 +220,17 @@ def generateIndex(path, files, dirs, cfg):
             )
         )
 
-
 def goDeeper(starting_path, cfg):
     for actual_dir, dirs, files in os.walk(starting_path, topdown=True):
+        actual_dir = actual_dir #unicode_it(actual_dir, "utf8")
         if cfg.use_verbose:
             print(('walking into directory: ', actual_dir))
-        files[:] = [f for f in filterImages(files, cfg)
+        
+        files[:] = [unicode(f) for f in filterImages(files, cfg)
                          if f not in cfg.excluded_files(actual_dir)
                          and not cfg.excluded_file_formats(f)]
         #won't walk into some "excluded paths" (if needed)
-        dirs[:] = [d for d in dirs if d not in cfg.excluded_folders(actual_dir)]
+        dirs[:] = [unicode(d) for d in dirs if d not in cfg.excluded_folders(actual_dir)]
         if cfg.use_verbose:
             print('now generating index...')
         generateCovers(actual_dir, files, cfg)

@@ -33,22 +33,26 @@ See Configuration.md file for every information you may need.
 Dependencies
 ===
 * Jinja2 (from the Cheese Shop or github)
-* Pillow (from the Cheese Shop or github)
 * optparse (stdlib)
 
-30 dec 2013: officially switched to Pillow
+In order to generate thumbnails, you can choose between
+* Pillow (from the Cheese Shop or github)
+* PIL (from PythonWare website)
+In 29 dec 2013 Teca officially supported Pillow: now both PIL and Pillow can be used.
+In the log, you can read why:
 ```
 <Robertof> alfateam123
 <Robertof> :: Vuoi sostituire python2-imaging con community/python2-pillow? [S/n] s
 <Robertof> io faccio y
 <alfateam123> Robertof: massì, prova
 <alfateam123> sostituisci
-<Robertof> già fatto alfateam123 
+<Robertof> già fatto alfateam123
 <alfateam123> lol
 ```
 
 TODO
 ===
 * refactor Teca
-* write configuration documentation
+* [STARTED] write configuration documentation
 * do a stylesheet. or at least, build a better UI.
+* [DONE] Support UTF-8
