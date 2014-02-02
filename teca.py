@@ -9,6 +9,8 @@ from optparse import OptionParser
 #external libraries
 import jinja2
 
+from teca.ConfigHandler import ConfigHandler
+
 #fuckin' trick for UTF-8. That's the reason I flied away from Python a long time ago.
 import sys
 reload(sys) #adds setdefaultencoding in the available attributes
@@ -20,144 +22,6 @@ try:
 except ImportError:
     #not Pillow => you're using PIL
     import Image 
-
-
-class ConfigHandler(object):
-
-    def __init__(self, config_json_path=None, options_from_cmd=None):
-        if config_json_path:
-            self.config = json.load(open(config_json_path))
-        else:
-            self.config = {
-                "image_formats":[
-                    "jpg", "tiff", "png", "bmp"
-                    ],
-                "excluded_folders":[
-                ]
-            }
-        if options_from_cmd:
-            self.cmd_config = options_from_cmd
-        else:
-            self.cmd_config = dict()
-
-    @property
-    def use_verbose(self):
-        return self.cmd_config["verbose"]
-
-    @property
-    def image_formats(self):
-        return self.config["image_formats"]
-
-    #@property
-    def excluded_folders(self, path):
-        try:
-            return self._get_obj_from_path(path)["excluded_folders"]
-        except KeyError:
-            return list()
-
-    #@property
-    def excluded_files(self, path):
-        try:
-            return self._get_obj_from_path(path)["excluded_files"]
-        except KeyError:
-            return list()
-
-    def excluded_file_formats(self, filename):
-        return any(
-                map(
-                    lambda regex_format: re.match(regex_format, filename), 
-                    self.config["excluded_file_formats"]
-                    )
-                )
-
-    def _get_obj_from_path(self, path):
-        """
-        Internal
-        """
-        #paths are in this format:
-        #other/another/more/folder/name
-        #and, in file, it's like
-        #"paths":{"other":{"another":{"more":{"folder":{"name":{}}}}}}
-        #for i in os.split
-        obj_from_path = self.config["paths"]
-        try:
-            for subpath in filter(bool, path.split(os.path.sep)):
-                obj_from_path = obj_from_path["paths"][subpath]
-        except KeyError:
-            obj_from_path = dict()
-        return obj_from_path
-
-    #@property
-    def title(self, path):
-        """
-        returns the title to display when referring
-        to the folder with the given path.
-        paths should be like
-        > "anime/yahari"
-        > "games/ff14"
-        """
-        try:
-            return self._get_obj_from_path(path)["title"]
-        except KeyError:
-            #doing some fast modification to folder name, using it as a default
-            return path.split(os.path.sep)[-1].replace("_", " ").capitalize()
-
-    def cover_image_name(self, path):
-        try:
-            return self._get_obj_from_path(path)["cover_image"]
-        except KeyError:
-            return ":random" #":" symbol in a filename is not allowed in the major filesystems.
-
-    def thumbnail_size(self, path):
-        try:
-            thumb_size_dict = self._get_obj_from_path(path)["thumbnail_size"]
-        except KeyError:
-            thumb_size_dict = self.config["thumbnail_size"]
-        return (thumb_size_dict["width"], thumb_size_dict["height"])
-
-    def cover_size(self, path):
-        try:
-            cover_size_dict = self._get_obj_from_path(path)["cover_size"]
-        except KeyError:
-            cover_size_dict = self.config["cover_size"]
-        return (cover_size_dict["width"], cover_size_dict["height"])
-
-    @property
-    def image_prefix_path(self, path):
-        """
-        fool idea: allowing links on other sites.
-        it's transparent for the end user.
-        """
-        try:
-            return self._get_obj_from_path(path)["fspath"]
-        except IndexError:
-            return ""
-
-    @property
-    def regenerate_thumbnails(self):
-        return self.config["regenerate_thumbnails"]
-    
-    def template_path(self, path):
-        try:
-            self._get_obj_from_path(path)["template_path"]
-        except KeyError:
-            return self.config["template_path"]
-
-
-    @property
-    def directories_on_a_row(self):
-        try:
-            return self.config["directories_on_a_row"]
-        except KeyError:
-            return 1
-    
-    @property
-    def images_on_a_row(self):
-        try:
-            return self.config["images_on_a_row"]
-        except KeyError:
-            return 1
-
 
 def filterImages(files, cfg):
     """this function just filter images using given image formats."""
@@ -204,6 +68,7 @@ def generateIndex(path, files, dirs, cfg):
     if cfg.use_verbose:
         print("directories: "+"\n\t".join(dirs))
         print("files: "+"\n\tinserted: ".join(files))
+        print("{0} -> >{1}< {2}".format(path, cfg.template_path(path), cfg.config.config["template_path"]))
 
     import codecs    
     codecs.open(os.path.join(path, "index.html"), "w", encoding = 'utf-8').write(
