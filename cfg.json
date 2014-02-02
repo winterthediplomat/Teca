@@ -1,21 +1,30 @@
 {
     "paths":{
-        "excluded_folders": ["testfolder"],
-        "excluded_files":["dati_team_bitbucket.png"],
-        "paths":{
-            "anime_screens":{
-                "title": "Anime Screens",
-                "excluded_folders": [],
-                "excluded_files": [],
-                "paths": {
-                    "bakemonogatari" :{
-                        "title": "Bakemonogatari (aka: la miglior serie di sempre)",
-                        "cover_image": "vlcsnap-2013-03-13-07h36m38s219.png"
-                    },
-                    "fight Ippatsu! Juuden-chan":{
-                        "paths":{
-                            "gingitsune":{
-                                "cover_image": "[Aozora] Gingitsune - 05 [720p x264-AAC][Hi10P][91C80E3C].mkv_snapshot_13.03_[2013.11.26_23.16.32].png"
+        "anime_screens":{
+            "title": "Anime Screens",
+            "excluded_folders": [],
+            "excluded_files": [],
+            "paths": {
+                "bakemonogatari" :{
+                    "title": "Bakemonogatari (aka: la miglior serie di sempre)",
+                    "cover_image": "vlcsnap-2013-03-13-07h36m38s219.png"
+                },
+                "fight Ippatsu! Juuden-chan":{
+                    "paths":{
+                        "gingitsune":{
+                            "cover_image": "[Aozora] Gingitsune - 05 [720p x264-AAC][Hi10P][91C80E3C].mkv_snapshot_13.03_[2013.11.26_23.16.32].png"
+                        }
+                    }
+                },
+                "denpa onno to seishun otoko":{
+                    "title": "benvenuti nel 2023",
+                    "paths":{
+                        "nisekoi":{
+                            "title": "kanahana >>>> *",
+                            "paths":{
+                                "random":{
+                                    "title": "random fanarts related to 'False Love'"
+                                }
                             }
                         }
                     }
@@ -23,6 +32,8 @@
             }
         }
     },
+    "excluded_folders": ["testfolder"],
+    "excluded_files":["dati_team_bitbucket.png"],
     "image_formats":[
           "jpg"
         , "tiff"
