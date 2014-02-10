@@ -44,7 +44,7 @@
         "^thumb_",
         "^cover_"
     ],
-    "template_path": "default.html",
+    "template_path": "templates/lazyloading.html",
     "thumbnail_size": {
         "width": 640,
         "height": 360
