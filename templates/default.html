@@ -1,5 +1,7 @@
+<!DOCTYPE html>
 <html>
 <head>
+  <meta charset="utf-8"> 
   <title>{{title}} - Teca</title>
 </head>
 <body>
@@ -13,7 +15,7 @@
   	{% for dirname in dirs %}
       <td>
         <a href='{{dirname}}/index.html'>
-          <img {#height='{{cover_height}}' width='{{cover_width}}'#} src='{{dirname}}/cover_.png' />
+          <img height='{{cover_height}}' width='{{cover_width}}' src="{{dirname}}/cover_.png" />
         </a>
         <br />
         <a href='{{dirname}}/index.html'>{{dirname}}</a>
@@ -31,7 +33,7 @@
     <tr>
     {% for filename in files %}
       <td>
-        <a href='{{filename}}'><img src='thumb_{{filename}}' /></a>
+        <a href="{{filename}}"><img src="thumb_{{filename}}" /></a>
       </td>
       {% if loop.index is divisibleby images_no %}
       </tr>

@@ -1,4 +1,4 @@
-#-*- coding:utf8 -*-
+# -*- coding: utf-8 -*-
 
 #stdlib
 import os
@@ -8,139 +8,20 @@ import random
 from optparse import OptionParser
 #external libraries
 import jinja2
-from PIL import Image
 
+from teca.ConfigHandler import ConfigHandler
 
+#fuckin' trick for UTF-8. That's the reason I flied away from Python a long time ago.
+import sys
+reload(sys) #adds setdefaultencoding in the available attributes
+sys.setdefaultencoding('utf-8')
 
-class ConfigHandler(object):
-
-    def __init__(self, config_json_path=None, options_from_cmd=None):
-        if config_json_path:
-            self.config = json.load(open(config_json_path))
-        else:
-            B
-            self.config = {
-                "image_formats":[
-                    "jpg", "tiff", "png", "bmp"
-                    ],
-                "excluded_folders":[
-                ]
-            }
-        if options_from_cmd:
-            self.cmd_config = options_from_cmd
-        else:
-            self.cmd_config = dict()
-
-    @property
-    def use_verbose(self):
-        return self.cmd_config["verbose"]
-
-    @property
-    def image_formats(self):
-        return self.config["image_formats"]
-
-    #@property
-    def excluded_folders(self, path):
-        return self._get_obj_from_path(path)["excluded_folders"]
-
-    #@property
-    def excluded_files(self, path):
-        return self._get_obj_from_path(path)["excluded_files"]
-
-    def excluded_file_formats(self, filename):
-        return any(
-                map(
-                    lambda regex_format: re.match(regex_format, filename), 
-                    self.config["excluded_file_formats"]
-                    )
-                )
-
-    def _get_obj_from_path(self, path):
-        """
-        Internal
-        """
-        #paths are in this format:
-        #other/another/more/folder/name
-        #and, in file, it's like
-        #"paths":{"other":{"another":{"more":{"folder":{"name":{}}}}}}
-        #for i in os.split
-        obj_from_path = self.config["paths"]
-        try:
-            for subpath in filter(bool, path.split(os.path.sep)):
-                obj_from_path = obj_from_path[subpath]
-        except KeyError: #we give a default
-            obj_from_path = {
-                "title": filter(bool, path.split(os.path.sep))[-1].capitalize(),
-                "excluded_folders": [],
-                "excluded_files": []
-            }
-        return obj_from_path
-
-    #@property
-    def title(self, path):
-        """
-        returns the title to display when referring
-        to the folder with the given path.
-        paths should be like
-        > "anime/yahari"
-        > "games/ff14"
-        """
-        return self._get_obj_from_path(path)["title"]
-
-    def cover_image_name(self, path):
-        try:
-            return self._get_obj_from_path(path)["cover_image"]
-        except KeyError:
-            return ":random" #":" sign in a filename is not allowed in the major filesystems.
-
-    def thumbnail_size(self, path):
-        try:
-            thumb_size_dict = self._get_obj_from_path(path)["thumbnail_size"]
-        except KeyError:
-            thumb_size_dict = self.config["thumbnail_size"]
-        return (thumb_size_dict["width"], thumb_size_dict["height"])
-
-    def cover_size(self, path):
-        try:
-            cover_size_dict = self._get_obj_from_path(path)["cover_size"]
-        except KeyError:
-            cover_size_dict = self.config["cover_size"]
-        return (cover_size_dict["width"], cover_size_dict["height"])
-
-    @property
-    def image_prefix_path(self, path):
-        """
-        fool idea: allowing links on other sites.
-        it's transparent for the end user.
-        """
-        try:
-            return self._get_obj_from_path(path)["fspath"]
-        except IndexError:
-            return ""
-
-    @property
-    def regenerate_thumbnails(self):
-        return self.config["regenerate_thumbnails"]
-    
-
-    @property
-    def template_path(self):
-        return self.config["template_path"]
-
-    @property
-    def directories_on_a_row(self):
-        try:
-            return self.config["directories_on_a_row"]
-        except KeyError:
-            return 1
-    
-    @property
-    def images_on_a_row(self):
-        try:
-            return self.config["images_on_a_row"]
-        except KeyError:
-            return 1
-
+try:
+    #let's try Pillow
+    from PIL import Image
+except ImportError:
+    #not Pillow => you're using PIL
+    import Image 
 
 def filterImages(files, cfg):
     """this function just filter images using given image formats."""
@@ -187,10 +68,12 @@ def generateIndex(path, files, dirs, cfg):
     if cfg.use_verbose:
         print("directories: "+"\n\t".join(dirs))
         print("files: "+"\n\tinserted: ".join(files))
+        print("{0} -> >{1}< {2}".format(path, cfg.template_path(path), cfg.config.config["template_path"]))
 
-    open(os.path.join(path, "index.html"), "w").write(
+    import codecs    
+    codecs.open(os.path.join(path, "index.html"), "w", encoding = 'utf-8').write(
             jinja2.Template(
-            open(cfg.template_path).read()
+            open(cfg.template_path(path)).read()
                 ).render(
                 title = cfg.title(path),
                 files = files,
@@ -202,16 +85,17 @@ def generateIndex(path, files, dirs, cfg):
             )
         )
 
-
 def goDeeper(starting_path, cfg):
     for actual_dir, dirs, files in os.walk(starting_path, topdown=True):
+        actual_dir = actual_dir #unicode_it(actual_dir, "utf8")
         if cfg.use_verbose:
             print(('walking into directory: ', actual_dir))
-        files[:] = [f for f in filterImages(files, cfg)
+        
+        files[:] = [unicode(f) for f in filterImages(files, cfg)
                          if f not in cfg.excluded_files(actual_dir)
                          and not cfg.excluded_file_formats(f)]
         #won't walk into some "excluded paths" (if needed)
-        dirs[:] = [d for d in dirs if d not in cfg.excluded_folders(actual_dir)]
+        dirs[:] = [unicode(d) for d in dirs if d not in cfg.excluded_folders(actual_dir)]
         if cfg.use_verbose:
             print('now generating index...')
         generateCovers(actual_dir, files, cfg)

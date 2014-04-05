@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"> 
+  <title>{{title}} - Teca</title>
+  <script>
+  Array.prototype.itemAt = function(index){
+    /*
+    the array[index] functionality, as it's meant to be.
+    also handling negative indexes!
+    https://1-media-cdn.foolz.us/ffuuka/board/a/image/1334/91/1334914118775.jpg
+    */
+    console.log("itemAt: "+index);
+    if(index>=0)
+      return this[index%this.length];
+    //index<0
+    //-15 % 4 = -3 -> 1
+    //it does not work if -index == this.length (e.g. -5%5 = 0)
+    if((index*-1)%this.length == 0)
+      return this[0];
+    return this[this.length+(index%this.length)];
+  }
+
+  //I swear, the day they will fail... it will be a day of horrible pain and furious anger.
+  var dirs_ = "{{dirs}}";
+  var files_ = "{{files}}";
+  //var dirnames = /\[\]/.test(dirs_)?new Array():eval("["+dirs_.replace(/(\s|\[)u\'([\w\d\s]+)/g, "'$2"));
+  //var filenames = /\[\]/.test(files_)?new Array():eval("["+files_.replace(/(\s|\[)u\'([\w\d\s]+)/g, "'$2"));
+  var dirnames = /\[\]/.test(dirs_)?new Array():eval("["+dirs_.replace(/(\s|\[)u\'/g, "'"));
+  var filenames = /\[\]/.test(files_)?new Array():eval("["+files_.replace(/(\s|\[)u\'/g, "'"));
+  var dirindex = 0;
+  var fileindex = 0; 
+
+  var change = function(imgtype, direction){
+    //updating the indexes
+    if(imgtype.toLowerCase()==='directory')
+      dirindex += (direction==='left'?-1:1);
+    else
+      fileindex += (direction==='left'?-1:1);
+
+    for(i in ["left", "center", "right"])
+    {
+      if(!/[0-9]+/.test((i).toString()))
+        continue;
+      console.log(i);
+      i=parseInt(i);
+      direction = ["left", "center", "right"][i];
+      var obj = document.getElementById(imgtype+"_"+ direction);
+      //assigning the right values
+      console.log(imgtype.toLowerCase()==='directory'?dirnames.itemAt(dirindex+i)+"/index.html":filenames.itemAt(fileindex+i));
+      obj.children[0]./*attributes["href"].value*/href=imgtype.toLowerCase()==='directory'?dirnames.itemAt(dirindex+i)+"/index.html":filenames.itemAt(fileindex+i);
+      console.log('modified as: '+obj.children[0].attributes["href"].value)
+      console.log(imgtype.toLowerCase()==='directory'?dirnames.itemAt(dirindex+i)+"/cover_.png":"thumb_"+filenames.itemAt(fileindex+i));
+      obj.children[0].children[0]./*attributes["src"].value*/src=imgtype.toLowerCase()==='directory'?dirnames.itemAt(dirindex+i)+"/cover_.png":"thumb_"+filenames.itemAt(fileindex+i);
+      console.log('modified as: '+obj.children[0].children[0].attributes["src"].value)
+      console.log('shiet done!');
+      console.log(obj);
+    }
+  };
+
+  var checkless = function(imgtype){
+    console.log("[checkless]: "+imgtype);
+    namelist = imgtype==='directory'?dirnames:filenames;
+    console.log("[checkless]: "+namelist.length);
+    if(namelist.length <= 3)
+    {
+      //removing the arrows
+      document.getElementById(imgtype+'_buttonleft').remove();
+      document.getElementById(imgtype+'_buttonright').remove();
+    }
+    if(namelist.length < 3)
+    {
+      console.log(imgtype+'_right');
+      document.getElementById(imgtype+'_right').remove();
+    }
+    if(namelist.length < 2)
+    {
+      console.log(imgtype+'_center');
+      document.getElementById(imgtype+'_center').remove();
+    }
+    if(namelist.length < 1)
+    {
+      console.log(imgtype+'_left');
+      //TODO: we should replace it using a "no subdirectories here!"
+      document.getElementById(imgtype+'_left').remove();
+    }
+  };
+
+  var loadCarousels = function(){
+    change('directory', 'left');
+    change('directory', 'right');
+    change('file', 'left');
+    change('file', 'right');
+    checkless('directory');
+    checkless('file');
+  };
+  </script>
+</head>
+<body onLoad = 'loadCarousels()'>
+  <div>{{title}}</div>
+  <div id='dirs'>
+    <div id='backdirectory'>
+       <a href='{{back_folder}}/index.html'>Back to upper folder</a>
+    </div>
+  	<table>
+  	<tr>
+      <td><input id='directory_buttonleft' type='button' onclick='change("directory", "left")' value='<'/></td>
+  	  <td>
+        <div id='directory_left'>
+        <a href='index.html'>
+          <img height='{{cover_height}}' width='{{cover_width}}'/>
+        </a>
+        <br />
+        <a href='index.html'>{{dirname}}</a>
+        </div>
+      </td>
+      <td>
+        <div id='directory_center'>
+        <a href='index.html'>
+          <img height='{{cover_height}}' width='{{cover_width}}' />
+        </a>
+        <br />
+        <a href='index.html'>{{dirname}}</a>
+        </div>
+      </td>
+      <td>
+        <div id='directory_right'>
+        <a href='index.html'>
+          <img height='{{cover_height}}' width='{{cover_width}}'/>
+        </a>
+        <br />
+        <a href='index.html'>{{dirname}}</a>
+        </div>
+      </td>
+      <td><input id='directory_buttonright' type='button' onclick='change("directory", "right")' value='>'/></td>
+     </tr>
+    </table>
+  </div>
+  <div id='files'>
+    <table>
+    <tr>
+      <td><input id='file_buttonleft' type='button' onclick='change("file", "left")' value='<'/></td>
+      <td>
+        <div id='file_left'>
+        <a href='index.html'>
+          <img height='{{cover_height}}' width='{{cover_width}}'/>
+        </a>
+        <br />
+        </div>
+      </td>
+      <td>
+        <div id='file_center'>
+        <a href='index.html'>
+          <img height='{{cover_height}}' width='{{cover_width}}'/>
+        </a>
+        <br />
+        </div>
+      </td>
+      <td>
+        <div id='file_right'>
+        <a href='index.html'>
+          <img height='{{cover_height}}' width='{{cover_width}}'/>
+        </a>
+        <br />
+        </div>
+      </td>
+      <td><input id='file_buttonright' type='button' onclick='change("file", "right")' value='>'/></td>
+     </tr>
+    </table>
+    </tr>
+    </table>
+  </div>
+</body>
+</html>
