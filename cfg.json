@@ -42,9 +42,10 @@
     ],
     "excluded_file_formats":[
         "^thumb_",
-        "^cover_"
+        "^cover_",
+        "^default_"
     ],
-    "template_path": "templates/lazyloading.html",
+    "template_path": "templates/default.html",
     "thumbnail_size": {
         "width": 640,
         "height": 360
@@ -55,5 +56,6 @@
     },
     "regenerate_thumbnails": false,
     "directories_on_a_row": 3,
-    "images_on_a_row": 3
+    "images_on_a_row": 3,
+    "default_image": "default_images/default_.jpg"
 }

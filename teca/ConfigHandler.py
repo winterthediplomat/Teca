@@ -48,25 +48,25 @@ class ConfigHandler(object):
 
     def adapt(self, config_dict, father_obj=None, ind=0):
         """Internal"""
-        #return config_dict
 
         #if we're called, we are sure that the json is valid and a valid config_dict has been generated
-        #print "config_dict: ", config_dict
         root_cfg = FolderConfig(config_dict)
-        #print "root before merge: ", root_cfg
+        
         if father_obj: father_obj.paths = dict()
         root_cfg.merge_with(father_obj or FolderConfig()) #add values that are not defined in children
-        #print "father: ", father_obj
-
-        #print "root after merge: ", root_cfg
+        
         converted_paths=dict()
         for subfolder_name, subfolder_config in root_cfg.paths.iteritems():
-            #print '\t'*ind+"going to adapt {0}.".format(subfolder_name, root_cfg)
             converted_paths[subfolder_name] = self.adapt(subfolder_config, root_cfg, ind+1)
-            #print '\t'*ind+"[DEBUG]: {0}".format(converted_paths.keys())
         root_cfg.paths=converted_paths
-        #root_cfg.paths = dict((subfolder_name, self.adapt(subfolder_config, root_cfg)) for subfolder_name, subfolder_config in root_cfg.paths.iteritems())
         return root_cfg
+
+    #test, in order to fix the "can't find configuration for this folder" warning
+    @property
+    def starting_path(self):
+        s_p = self.cmd_config["starting_path"]
+        if not s_p.endswith("/"): s_p += '/'
+        return s_p
 
     @property
     def use_verbose(self):
@@ -106,7 +106,8 @@ class ConfigHandler(object):
         #other/another/more/folder/name
         #and, in file, it's like
         #"paths":{"other":{"another":{"more":{"folder":{"name":{}}}}}}
-        #for i in os.split
+        #using os.path.abspath on @path in order to fix the warning given at KeyError
+        path = path.replace(os.path.abspath(self.starting_path), "")
         obj_from_path = self.config.config #self.config["paths"]
         try:
             for subpath in filter(bool, path.split(os.path.sep)):
@@ -195,3 +196,7 @@ class ConfigHandler(object):
             return self.config["algorithm"]
         except KeyError:
             return 'md5'
+
+    @property
+    def default_image(self):
+        return self.config["default_image"]
