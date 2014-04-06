@@ -50,7 +50,6 @@ class ConfigHandler(object):
         """Internal"""
 
         #if we're called, we are sure that the json is valid and a valid config_dict has been generated
-        
         root_cfg = FolderConfig(config_dict)
         
         if father_obj: father_obj.paths = dict()
@@ -58,8 +57,6 @@ class ConfigHandler(object):
         
         converted_paths=dict()
         for subfolder_name, subfolder_config in root_cfg.paths.iteritems():
-            #os.path.abspath used in order to fix a "can't find configuration for this folder" warning
-            #converted_paths[os.path.abspath(subfolder_name)] = self.adapt(subfolder_config, root_cfg, ind+1)
             converted_paths[subfolder_name] = self.adapt(subfolder_config, root_cfg, ind+1)
         root_cfg.paths=converted_paths
         return root_cfg
@@ -109,9 +106,8 @@ class ConfigHandler(object):
         #other/another/more/folder/name
         #and, in file, it's like
         #"paths":{"other":{"another":{"more":{"folder":{"name":{}}}}}}
-        #using os.path.abspath on @path in order to fix the warning.
-        #path = os.path.abspath(path)
-        path = os.path.abspath(path).replace(os.path.abspath(self.starting_path), "")
+        #using os.path.abspath on @path in order to fix the warning given at KeyError
+        path = path.replace(os.path.abspath(self.starting_path), "")
         obj_from_path = self.config.config #self.config["paths"]
         try:
             for subpath in filter(bool, path.split(os.path.sep)):
@@ -200,3 +196,7 @@ class ConfigHandler(object):
             return self.config["algorithm"]
         except KeyError:
             return 'md5'
+
+    @property
+    def default_image(self):
+        return self.config["default_image"]
