@@ -1,6 +1,7 @@
 #-*- coding:utf8 -*-
 
-from teca import *
+from teca.ConfigHandler import ConfigHandler
+from teca.utils import handleCmd, filterImages
 import os
 
 if __name__ == "__main__":

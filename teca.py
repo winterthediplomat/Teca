@@ -10,6 +10,7 @@ from optparse import OptionParser
 import jinja2
 
 from teca.ConfigHandler import ConfigHandler
+from teca.utils import handleCmd, filterImages
 
 #fuckin' trick for UTF-8. That's the reason I flied away from Python a long time ago.
 import sys
@@ -22,12 +23,6 @@ try:
 except ImportError:
     #not Pillow => you're using PIL
     import Image 
-
-def filterImages(files, cfg):
-    """this function just filter images using given image formats."""
-    regex = "\.(" + "|".join(cfg.image_formats) + ")$"
-    #filter(lambda s: re.match(regex, s), files)
-    return [s for s in files if re.findall(regex, s)]
 
 
 def generateCovers(path, files, cfg):
@@ -133,23 +128,6 @@ def goDeeper(starting_path, cfg):
         generateThumbnails(actual_dir, files, cfg)
         generateIndex(actual_dir, files, dirs, cfg)
 
-def handleCmd():
-    parser = OptionParser()
-    parser.add_option('-c', '--config',
-             dest='cfgpath',
-             default='./cfg.json',
-             help='the path of the configuration file'
-        )
-    parser.add_option('-v', '--verbose',
-             default=False,
-             help='useful for logging and debugging.'
-        )
-    (options, args) = parser.parse_args()
-    return {
-        "cfgpath": options.cfgpath,
-        "verbose": options.verbose,
-        "starting_path": os.path.abspath(args[0])
-        }
 
 if __name__ == "__main__":
     options = handleCmd()
