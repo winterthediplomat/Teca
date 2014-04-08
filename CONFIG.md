@@ -97,3 +97,9 @@ _Note:_ the rules defined at root are valid for every subfolder. If you want to 
 This parameter is _optional_, by default is 1.
 
 _Note:_ the rules defined at root are valid for every subfolder. If you want to overwrite the rules for a folder, you have to re-define the parameter in the subfolder description. This overwrite is not reflected to folder's children.
+
+**default_image**: this is the path of the default image.
+
+This image will be used in case a folder (and its inner folders) does not have images.
+
+This parameter is _not optional_, at least at root level.
