@@ -31,9 +31,9 @@
   <div id='files'>
     <table>
     <tr>
-    {% for filename in files %}
+    {% for filename in images %}
       <td>
-        <a href="{{filename}}"><img src="thumb_{{filename}}" /></a>
+        <a href="{{files[loop.index-1]}}"><img src="thumb_{{filename}}" /></a>
       </td>
       {% if loop.index is divisibleby images_no %}
       </tr>

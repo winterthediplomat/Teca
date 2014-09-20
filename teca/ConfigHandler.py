@@ -3,6 +3,7 @@ import sys
 import re
 import json
 import random
+from collections import namedtuple
 
 class FolderConfig(object):
     
@@ -113,7 +114,7 @@ class ConfigHandler(object):
             for subpath in filter(bool, path.split(os.path.sep)):
                 obj_from_path = obj_from_path["paths"][subpath]
         except KeyError:
-            print "[warning] got an error while retrieving the object, path: {0}".format(path)
+            print("[warning] got an error while retrieving the object, path: {0}".format(path))
             obj_from_path = dict()
         return obj_from_path
 
@@ -130,7 +131,7 @@ class ConfigHandler(object):
             return self._get_obj_from_path(path)["title"]
         except KeyError:
             #doing some fast modification to folder name, using it as a default
-            print "[warning] not found a title for {0}".format(path)
+            print("[warning] not found a title for {0}".format(path))
             return path.split(os.path.sep)[-1].replace("_", " ").capitalize()
 
     def cover_image_name(self, path):
@@ -172,7 +173,7 @@ class ConfigHandler(object):
         try:
             return self._get_obj_from_path(path)["template_path"]
         except KeyError:
-            print "[warning]: got a key error retrieving template_path for {0}, using default".format(path)
+            print("[warning]: got a key error retrieving template_path for {0}, using default".format(path))
             return self.config["template_path"]
 
 
@@ -200,3 +201,9 @@ class ConfigHandler(object):
     @property
     def default_image(self):
         return self.config["default_image"]
+
+    @property
+    def short_links(self):
+      #ShortLinks = namedtuple("ShortLinksProperties", "use_feature short_url symlink_folder links_database")
+      #a = ShortLinks(self.config["short_links"].use_feature,
+      return FolderConfig(self.config["short_links"]) #re-using the object

@@ -1,11 +1,14 @@
 # -*- coding: utf-8 -*-
 
+from __future__ import unicode_literals
+
 #stdlib
 import os
 import re
 import json
 import random
 from optparse import OptionParser
+from string import ascii_letters
 #external libraries
 import jinja2
 
@@ -25,6 +28,29 @@ except ImportError:
     import Image 
 
 
+def generateThumbnails(path, files, cfg):
+    def token(list_of_tokens=None,lenght=7, alphabet=ascii_letters+"0123456789"):
+        if not list_of_tokens: list_of_tokens = dict()
+        is_ok, new_token = False, None
+        while not is_ok:
+          new_token = "".join(alphabet[random.randrange(len(ascii_letters))] for i in range(length))
+          is_ok = new_token not in list_of_tokens
+        return new_token #we assume we'll exit from the previous cycle w
+
+    if cfg.short_links.use_feature:
+      with open(cfg.short_links.links_database) as links_file:
+          links = json.load(links_file)
+          for file_ in files:
+              fullpath = os.path.join(path, file_)
+              if fullpath not in links:
+                  code = token(links.values())
+                  os.symlink(os.path.join(cfg.short_links.symlink_folder, code), fullpath)
+                  links[fullpath] = code
+              else: #fullpath in links
+                  if not os.path.exists(os.path.join(cfg.short_links.symlink_folder, links[fullpath])): #we need to recreate the token
+                    os.symlink(os.path.join(cfg.short_links.symlink_folder, links[fullpath]))
+      json.dump(links, cfg.short_links.links_database)
+
 def generateCovers(path, files, cfg):
     def choose_image(path, files, cfg):
         try:
@@ -33,13 +59,13 @@ def generateCovers(path, files, cfg):
             #return None
             #looking into subfolders
             if cfg.use_verbose:
-                print "[choose_image] there are no images in {0}".format(path)
+                print("[choose_image] there are no images in {0}".format(path))
             _, dirs, _ = os.walk(path).next() #getting the first-level directories
             try:
                 chosen_dir = random.choice([unicode(d) for d in dirs if d not in cfg.excluded_folders(path)])
                 try:
                     if cfg.use_verbose:
-                        print "[choose_image] the path we're looking files into: {0}".format(os.path.join(path, chosen_dir))
+                        print("[choose_image] the path we're looking files into: {0}".format(os.path.join(path, chosen_dir)))
                     _, _, files = os.walk(os.path.join(path, chosen_dir)).next()
                     files = [unicode(f) for f in filterImages(files, cfg)
                          if f not in cfg.excluded_files(chosen_dir)
@@ -63,7 +89,7 @@ def generateCovers(path, files, cfg):
     except IOError:
         #TODO: probably it could fail if launching Teca from another folder
         if cfg.use_verbose:
-            print "image {0} not found, looking {1}".format(full_filename, os.path.join(os.path.abspath(""), filename))
+            print("image {0} not found, looking {1}".format(full_filename, os.path.join(os.path.abspath(""), filename)))
         cover_obj = Image.open(os.path.join(os.path.abspath(""), filename))
     cover_obj.thumbnail(cfg.cover_size(path))
     cover_obj.save(os.path.join(path, "cover_.png"))#+os.path.splitext(filename)[-1]))
@@ -96,13 +122,19 @@ def generateIndex(path, files, dirs, cfg):
         print("files: "+"\n\tinserted: ".join(files))
         print("{0} -> >{1}< {2}".format(path, cfg.template_path(path), cfg.config.config["template_path"]))
 
-    import codecs    
+    if cfg.short_links.use_feature:
+        tokens = json.load(open(cfg.short_links.links_database))
+        urls = map(lambda fname: cfg.short_links.short_url+tokens[os.path.join(path, fname)], files)
+    else:
+        urls = files
+    import codecs
     codecs.open(os.path.join(path, "index.html"), "w", encoding = 'utf-8').write(
             jinja2.Template(
             open(cfg.template_path(path)).read()
                 ).render(
                 title = cfg.title(path),
-                files = files,
+                files = urls,
+                images =  files,
                 dirs = dirs,
                 path = path,
                 back_folder = not path and "" or "..",
@@ -124,6 +156,7 @@ def goDeeper(starting_path, cfg):
         dirs[:] = [unicode(d) for d in dirs if d not in cfg.excluded_folders(actual_dir)]
         if cfg.use_verbose:
             print('now generating index...')
+        generateThumbnails(actual_dir, files, cfg)
         generateCovers(actual_dir, files, cfg)
         generateThumbnails(actual_dir, files, cfg)
         generateIndex(actual_dir, files, dirs, cfg)
