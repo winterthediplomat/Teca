@@ -122,11 +122,20 @@ def generateIndex(path, files, dirs, cfg):
         print("files: "+"\n\tinserted: ".join(files))
         print("{0} -> >{1}< {2}".format(path, cfg.template_path(path), cfg.config.config["template_path"]))
 
-    if cfg.short_links.use_feature:
-        tokens = json.load(open(cfg.short_links.links_database))
-        urls = map(lambda fname: cfg.short_links.short_url+tokens[os.path.join(path, fname)], files)
-    else:
+    try:
+        if cfg.short_links.use_feature:
+            shortlinks_use_feature = True
+            shortlinks_url = cfg.short_links.short_url
+            tokens = json.load(open(cfg.short_links.links_database))
+            urls = map(lambda fname: cfg.short_links.short_url+tokens[os.path.join(path, fname)], files)
+        else:
+            urls = files
+            shortlinks_use_feature = False
+            shortlinks_url = ""
+    except AttributeError:
         urls = files
+        shortlinks_use_feature = False
+        shortlinks_url = ""
     import codecs
     codecs.open(os.path.join(path, "index.html"), "w", encoding = 'utf-8').write(
             jinja2.Template(
@@ -139,7 +148,9 @@ def generateIndex(path, files, dirs, cfg):
                 path = path,
                 back_folder = not path and "" or "..",
                 dirs_no = cfg.directories_on_a_row,
-                images_no = cfg.images_on_a_row
+                images_no = cfg.images_on_a_row,
+                use_symlink = shortlinks_use_feature,
+                symlink_path = shortlinks_url
             )
         )
 
