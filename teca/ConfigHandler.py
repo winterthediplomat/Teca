@@ -8,7 +8,7 @@ from collections import namedtuple
 class FolderConfig(object):
     
     def __init__(self, dict_config=None):
-        for conf_key, conf_value in (dict_config or dict()).iteritems():
+        for conf_key, conf_value in (dict_config or dict()).items():
             self.__dict__[conf_key]=conf_value
 
     @property
@@ -21,7 +21,7 @@ class FolderConfig(object):
 
     def merge_with(self, father_obj=None):
         #print "merge result: ", dict(list(father_obj.config.iteritems())+list(self.config.iteritems()))
-        self.__dict__ = dict(list(father_obj.config.iteritems())+list(self.config.iteritems()))
+        self.__dict__ = dict(list(father_obj.config.items())+list(self.config.items()))
 
     def __str__(self):
         return repr(self.config)
@@ -57,7 +57,7 @@ class ConfigHandler(object):
         root_cfg.merge_with(father_obj or FolderConfig()) #add values that are not defined in children
         
         converted_paths=dict()
-        for subfolder_name, subfolder_config in root_cfg.paths.iteritems():
+        for subfolder_name, subfolder_config in root_cfg.paths.items():
             converted_paths[subfolder_name] = self.adapt(subfolder_config, root_cfg, ind+1)
         root_cfg.paths=converted_paths
         return root_cfg
@@ -78,14 +78,14 @@ class ConfigHandler(object):
         return self.config["image_formats"]
 
     #@property
-    def excluded_folders(self, path):
+    def excluded_folders(self, path=""):
         try:
             return self._get_obj_from_path(path)["excluded_folders"]
         except KeyError:
             return list()
 
     #@property
-    def excluded_files(self, path):
+    def excluded_files(self, path=""):
         try:
             return self._get_obj_from_path(path)["excluded_files"]
         except KeyError:

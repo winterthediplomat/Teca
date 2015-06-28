@@ -13,8 +13,8 @@ setup(
     description='simple static gallery generator',
     long_description=open('README.md').read(),
     install_requires=[
-        "jinja2",
-        "beautifulsoup4"
+        "jinja2", 
+        "pillow"
     ],
     classifiers=[
     "Development Status :: 4 - Beta",
