@@ -17,3 +17,6 @@ class DefaultConfigurationHandler(unittest.TestCase):
 
     def test_starting_path(self):
         self.assertRaises(KeyError, lambda: self.defConf.starting_path)
+
+    def test_use_verbose(self):
+        self.assertRaises(KeyError, lambda: self.defConf.use_verbose)
