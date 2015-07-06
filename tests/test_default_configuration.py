@@ -54,7 +54,6 @@ class DefaultConfigurationHandler(unittest.TestCase):
     def test_image_prefix_path(self):
         self.assertEqual(self.defConf.image_prefix_path("drawings/doomfest"), "")   
 
-
     def test_regenerate_thumbnails(self):
         self.assertRaises(KeyError, lambda: self.defConf.regenerate_thumbnails)
 

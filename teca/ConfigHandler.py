@@ -154,7 +154,6 @@ class ConfigHandler(object):
             cover_size_dict = self.config["cover_size"]
         return (cover_size_dict["width"], cover_size_dict["height"])
 
-    @property
     def image_prefix_path(self, path):
         """
         fool idea: allowing links on other sites.
@@ -162,8 +161,8 @@ class ConfigHandler(object):
         """
         try:
             return self._get_obj_from_path(path)["fspath"]
-        except IndexError:
-            return ""
+        except KeyError:
+              return ""
 
     @property
     def regenerate_thumbnails(self):
