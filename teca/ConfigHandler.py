@@ -138,7 +138,7 @@ class ConfigHandler(object):
         try:
             return self._get_obj_from_path(path)["cover_image"]
         except KeyError:
-            return ":random" #":" symbol in a filename is not allowed in the major filesystems.
+            return ""
 
     def thumbnail_size(self, path):
         try:

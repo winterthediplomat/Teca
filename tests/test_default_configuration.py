@@ -43,7 +43,7 @@ class DefaultConfigurationHandler(unittest.TestCase):
         self.assertRaises(KeyError, lambda: self.defConf._get_obj_from_path("anime/yahari"))
 
     def test_cover_image_name(self):
-        self.assertEqual(self.defConf.cover_image_name("tv/doctor/tennant"), ":random")
+        self.assertEqual(self.defConf.cover_image_name("tv/doctor/tennant"), "")
 
     def test_thumbnail_size(self):
         self.assertRaises(KeyError, lambda: self.defConf.thumbnail_size("drawings/doomfest"))

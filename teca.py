@@ -12,30 +12,18 @@ from string import ascii_letters
 #external libraries
 import jinja2
 
+import teca
+from teca.image import Image
 from teca.ConfigHandler import ConfigHandler
 from teca.utils import handleCmd, filterImages
 
 #fuckin' trick for UTF-8. That's the reason I flied away from Python a long time ago.
 import sys
 reload(sys) #adds setdefaultencoding in the available attributes
-sys.setdefaultencoding('utf-8')
-
-try:
-    #let's try Pillow
-    from PIL import Image
-except ImportError:
-    #not Pillow => you're using PIL. You should upgrade, but it's your choice.
-    import Image 
-
+sys.setdefaultencoding('utf-8') 
 
 def generateThumbnails(path, files, cfg):
-    def token(list_of_tokens=None,lenght=7, alphabet=ascii_letters+"0123456789"):
-        if not list_of_tokens: list_of_tokens = dict()
-        is_ok, new_token = False, None
-        while not is_ok:
-          new_token = "".join(alphabet[random.randrange(len(ascii_letters))] for i in range(length))
-          is_ok = new_token not in list_of_tokens
-        return new_token #we assume we'll exit from the previous cycle w
+    token = teca.generation.generateTokens 
 
     if cfg.short_links.use_feature:
       with open(cfg.short_links.links_database) as links_file:
@@ -52,38 +40,13 @@ def generateThumbnails(path, files, cfg):
       json.dump(links, cfg.short_links.links_database)
 
 def generateCovers(path, files, cfg):
-    def choose_image(path, files, cfg):
-        try:
-            filename = random.choice(files)
-        except IndexError:
-            #return None
-            #looking into subfolders
-            if cfg.use_verbose:
-                print("[choose_image] there are no images in {0}".format(path))
-            _, dirs, _ = os.walk(path).next() #getting the first-level directories
-            try:
-                chosen_dir = random.choice([unicode(d) for d in dirs if d not in cfg.excluded_folders(path)])
-                try:
-                    if cfg.use_verbose:
-                        print("[choose_image] the path we're looking files into: {0}".format(os.path.join(path, chosen_dir)))
-                    _, _, files = os.walk(os.path.join(path, chosen_dir)).next()
-                    files = [unicode(f) for f in filterImages(files, cfg)
-                         if f not in cfg.excluded_files(chosen_dir)
-                         and not cfg.excluded_file_formats(f)]
-                    filename = os.path.join(os.path.join(path, chosen_dir), random.choice(files))
-                except IndexError:
-                    #there are directories, but no files. we should go deeper.
-                    filename = choose_image(os.path.join(path, chosen_dir), files, cfg)
-            except IndexError:
-                #no files and no dirs... let's provide a default image.
-                filename = cfg.default_image
-        return filename
-        
+    choose_image = teca.generation.chooseImage
+    
     filename=cfg.cover_image_name(path)
-    if filename == ":random":
-        #filename = choose_image(path, files, cfg)
+    if filename == ":random": #no cover images chosen for this folder
         filename = choose_image(os.path.join(cfg.starting_path, path), files, cfg)
     full_filename = os.path.join(path, filename)
+
     try:
         cover_obj = Image.open(full_filename)
     except IOError:

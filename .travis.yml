@@ -9,4 +9,6 @@ python:
 # command to install dependencies
 install: "pip install --upgrade ."
 # command to run tests
-script: nosetests
+script:
+  - mkdir tests/test_data/images/emptyFolder
+  - nosetests

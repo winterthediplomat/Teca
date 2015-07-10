@@ -22,6 +22,13 @@ def handleCmd():
         }
 
 
+def _next(iterator):
+    try:
+        print("teca.utils._next", iterator, dir(iterator))
+        return next(iterator)
+    except NameError:
+        return iterator.next()
+
 def filterImages(files, cfg):
     """this function just filter images using given image formats."""
     regex = "\.(" + "|".join(cfg.image_formats) + ")$"
