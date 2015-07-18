@@ -3,7 +3,7 @@ from setuptools import setup
 
 setup(
     name='Teca',
-    version='0.1.9.1',
+    version='0.1.10',
     author='alfateam123',
     author_email='alfateam123@gmail.com',
     packages=['teca'],
