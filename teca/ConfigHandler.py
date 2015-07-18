@@ -6,7 +6,7 @@ import random
 from collections import namedtuple
 
 class FolderConfig(object):
-    
+
     def __init__(self, dict_config=None):
         for conf_key, conf_value in (dict_config or dict()).items():
             self.__dict__[conf_key]=conf_value
@@ -25,7 +25,7 @@ class FolderConfig(object):
 
     def __str__(self):
         return repr(self.config)
-    
+
     def __repr__(self):
         return repr(self.config)
 
@@ -52,10 +52,10 @@ class ConfigHandler(object):
 
         #if we're called, we are sure that the json is valid and a valid config_dict has been generated
         root_cfg = FolderConfig(config_dict)
-        
+
         if father_obj: father_obj.paths = dict()
         root_cfg.merge_with(father_obj or FolderConfig()) #add values that are not defined in children
-        
+
         converted_paths=dict()
         for subfolder_name, subfolder_config in root_cfg.paths.items():
             converted_paths[subfolder_name] = self.adapt(subfolder_config, root_cfg, ind+1)
@@ -94,7 +94,7 @@ class ConfigHandler(object):
     def excluded_file_formats(self, filename):
         return any(
                 map(
-                    lambda regex_format: re.match(regex_format, filename), 
+                    lambda regex_format: re.match(regex_format, filename),
                     self.config["excluded_file_formats"]
                     )
                 )
@@ -167,7 +167,7 @@ class ConfigHandler(object):
     @property
     def regenerate_thumbnails(self):
         return self.config["regenerate_thumbnails"]
-    
+
     def template_path(self, path):
         try:
             return self._get_obj_from_path(path)["template_path"]
@@ -182,7 +182,7 @@ class ConfigHandler(object):
             return self.config["directories_on_a_row"]
         except KeyError:
             return 1
-    
+
     @property
     def images_on_a_row(self):
         try:

@@ -1,6 +1,13 @@
 {
     "paths":{
       "cutegirlsarecute": { 
+      },
+      "you":{
+        "paths":{
+          "shall":{
+            "excluded_folders":["notpass"]
+          }
+        }
       }
     },
     "excluded_folders": ["hiddenfolder"],
