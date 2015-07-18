@@ -14,7 +14,8 @@ setup(
     long_description=open('README.md').read(),
     install_requires=[
         "jinja2", 
-        "pillow"
+        "pillow",
+        "six"
     ],
     extras_require={
       "test": ["coverage"]

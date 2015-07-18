@@ -1,5 +1,6 @@
 import os
-from teca.utils import _next
+import six.next as _next
+import re
 
 def walk(starting_path, cfg):
     #raise NotImplementedError("walk")
@@ -17,12 +18,12 @@ def walk(starting_path, cfg):
     at_least_one_folder = False
     for dirpath, dirnames, filenames in os.walk(starting_path):
         at_least_one_folder = True
-    
+
         filterDirectories(dirpath, dirnames, cfg)
         filterFiles(dirpath, filenames, cfg)
 
         yield dirpath, dirnames, filenames
-    
+
     if not at_least_one_folder:
         yield ("", [], [])
 

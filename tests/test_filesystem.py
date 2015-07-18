@@ -1,5 +1,5 @@
 import teca.filesystem as tecafs
-from teca.utils import _next
+import six.next as _next
 import teca.ConfigHandler as tecaconf
 import unittest
 
@@ -9,9 +9,9 @@ class SameConfClass(object):
             "tests/test_data/configuration.json",
             {"starting_path": "tests/test_data/images/"}
         )
-    
+
 class TestWalk(SameConfClass, unittest.TestCase):
-    
+
     def test_foldersAtRoot(self):
         _, folders, _ = _next(tecafs.walk("", self.conf))
         self.assertEqual(set(["emptyFolder", "you", "ohwait", "cutegirlsarecute"]),
