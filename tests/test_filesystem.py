@@ -1,5 +1,5 @@
 import teca.filesystem as tecafs
-import six.next as _next
+from six import next as _next
 import teca.ConfigHandler as tecaconf
 import unittest
 

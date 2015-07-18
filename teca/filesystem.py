@@ -1,5 +1,5 @@
 import os
-import six.next as _next
+from six import next as _next
 import re
 
 def walk(starting_path, cfg):
