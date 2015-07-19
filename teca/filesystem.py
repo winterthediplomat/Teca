@@ -4,8 +4,6 @@ import re
 import teca.utils as tecautils
 
 def walk(starting_path, cfg):
-    #raise NotImplementedError("walk")
-
     #print("teca.filesystem.walk: starting_path", starting_path)
 
     if not starting_path:
@@ -42,6 +40,11 @@ def filterFiles(dirpath, fnames, cfg):
     filterAccordingToFunction(dirpath, fnames, cfg, cfg.excluded_files)
     #remove files if their extension is not supported
     fnames[:] = tecautils.filterImages(fnames, cfg)
+    filterFilesIfInExcludedFileFormat(dirpath, fnames, cfg)
+
+def filterFilesIfInExcludedFileFormat(dirpath, fnames, cfg):
+    dirpath = dirpath.replace(cfg.starting_path, "")
+    fnames[:] = [fname for fname in fnames if not cfg.excluded_file_formats(fname)]
 
 def filterAccordingToFunction(dirpath, items, cfg, function_):
     dirpath = dirpath.replace(cfg.starting_path, "")

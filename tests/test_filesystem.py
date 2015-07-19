@@ -51,3 +51,7 @@ class TestFilesInDirectory(SameConfClass, unittest.TestCase):
     def test_filesInOnlyImagesFolder(self):
         fnames = tecafs.filesInFolder("ohwait/imagesonly", self.conf)
         self.assertNotEqual(len(fnames), 0)
+
+    def test_legitNamesOnly(self):
+        fnames = tecafs.filesInFolder("ohwait/imagesonly", self.conf)
+        self.assertTrue("thumb_lol.png" not in fnames)
