@@ -54,8 +54,6 @@ class SameConfClass(object):
                 }
             }
         })
-        for p, d, f in os.walk("tests"):
-            print(p, d, f)
 
     def tearDown(self):
         mockfs.restore_builtins()
