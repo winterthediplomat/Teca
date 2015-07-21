@@ -1,3 +1,7 @@
+#^_^ coding: utf8 ^_^
+
+import os
+import mockfs
 import teca.filesystem as tecafs
 from six import next as _next
 import teca.ConfigHandler as tecaconf
@@ -5,10 +9,56 @@ import unittest
 
 class SameConfClass(object):
     def setUp(self):
+        self.conf_path = "tests/test_data/configuration.json"
+        self.conf_content = open(self.conf_path).read()
+        self.starting_path = "tests/test_data/images/"
         self.conf = tecaconf.ConfigHandler(
-            "tests/test_data/configuration.json",
-            {"starting_path": "tests/test_data/images/"}
+            self.conf_path,
+            {"starting_path": self.starting_path}
         )
+
+        self.mfs = mockfs.replace_builtins()
+        self.mfs.add_entries({
+            "tests": {
+                "test_data":{
+                        "configuration.json" : self.conf_content,
+                        "images": {
+                            "cutegirlsarecute": {
+                                "yukinon.jpg": "",
+                                "charlotte.jpg": "",
+                                "misato.bmp": ""
+                            },
+                            "hiddenfolder": {
+                                "uselessdoc.txt": "useless content",
+                                "uselessimage.png": ""
+                            },
+                            "emptyFolder": {},
+                            "ohwait": {
+                                "imagesonly": {
+                                    "yukinon.jpg": "",
+                                    "specialchàr.jpg": "",
+                                    "thumb_lol.png": ""
+                                }
+                            },
+                            "you": {
+                               "shall": {
+                                   "notpass": {
+                                       "kaiki.gif": ""
+                                   },
+                                   "pass": {
+                                       "eruna.jpg": ""
+                                   }
+                               }
+                            }
+                        }
+                }
+            }
+        })
+        for p, d, f in os.walk("tests"):
+            print(p, d, f)
+
+    def tearDown(self):
+        mockfs.restore_builtins()
 
 class TestWalk(SameConfClass, unittest.TestCase):
 
@@ -55,3 +105,7 @@ class TestFilesInDirectory(SameConfClass, unittest.TestCase):
     def test_legitNamesOnly(self):
         fnames = tecafs.filesInFolder("ohwait/imagesonly", self.conf)
         self.assertTrue("thumb_lol.png" not in fnames)
+
+    def test_specialFilenameInFolder(self):
+        fnames = tecafs.filesInFolder("ohwait/imagesonly", self.conf)
+        self.assertTrue("specialchàr.jpg" in fnames)
