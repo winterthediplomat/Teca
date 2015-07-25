@@ -18,7 +18,7 @@ setup(
         "six"
     ],
     extras_require={
-            "test": ["nose", "coverage"]
+            "test": ["nose", "mockfs", "coverage"]
     },
     classifiers=[
         "Development Status :: 4 - Beta",
