@@ -2,8 +2,11 @@ import os
 from six import next as _next
 import re
 import teca.utils as tecautils
+from collections import namedtuple
 
-def walk(starting_path, cfg):
+Directory = namedtuple("Directory", "path directories filenames")
+
+def walk(starting_path, cfg, deep=False):
     #print("teca.filesystem.walk: starting_path", starting_path)
 
     if not starting_path:
@@ -16,6 +19,9 @@ def walk(starting_path, cfg):
     #print("teca.filesystem.walk: starting_path", starting_path)
     at_least_one_folder = False
 
+    deep_dirnames  = list()
+    deep_filenames = list()
+
     for dirpath, dirnames, filenames in os.walk(starting_path):
         if isFolderHidden(dirpath, cfg, with_starting_path=True):
             break
@@ -25,10 +31,16 @@ def walk(starting_path, cfg):
         filterDirectories(dirpath, dirnames, cfg)
         filterFiles(dirpath, filenames, cfg)
 
-        yield dirpath, dirnames, filenames
+        if not deep:
+            yield dirpath, dirnames, filenames
+        else:
+            deep_dirnames.extend([os.path.join(dirpath, dirname_) for dirname_ in dirnames])
+            deep_filenames.extend([os.path.join(dirpath, filename_) for filename_ in filenames])
 
     if not at_least_one_folder:
-        yield ("", [], [])
+        yield Directory("", [], [])
+    elif deep:
+        yield Directory(starting_path, deep_dirnames, deep_filenames)
 
 
 
@@ -55,11 +67,9 @@ def filterAccordingToFunction(dirpath, items, cfg, function_):
             pass
 
 
-def filesInDirectory(dir_path, cfg):
-    _, _, fnames = _next(walk(dir_path, cfg))
+def filesInDirectory(dir_path, cfg, deep=False):
+    _, _, fnames = _next(walk(dir_path, cfg, deep))
     return fnames
-
-filesInFolder = filesInDirectory
 
 def isDirectoryEmpty(dir_path, cfg):
     _, dirnames, fnames = _next(walk(dir_path, cfg))
@@ -73,3 +83,6 @@ def isFolderHidden(dir_path, cfg, with_starting_path=False):
     locally_excluded  = os.path.basename(dir_path) in cfg.excluded_folders(os.path.dirname(dir_path))
     return globally_excluded or locally_excluded
 
+
+# aliases
+filesInFolder = filesInDirectory

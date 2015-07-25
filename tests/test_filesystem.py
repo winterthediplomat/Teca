@@ -107,3 +107,15 @@ class TestFilesInDirectory(SameConfClass, unittest.TestCase):
     def test_specialFilenameInFolder(self):
         fnames = tecafs.filesInFolder("ohwait/imagesonly", self.conf)
         self.assertTrue("specialchàr.jpg" in fnames)
+
+class TestFilesInDeepDirectory(SameConfClass, unittest.TestCase):
+
+    def test_legitImagesFromRootFolder(self):
+        fnames = tecafs.filesInFolder("", self.conf, deep=True)
+        fnames = [fn.replace("/"+self.starting_path, "") for fn in fnames]
+        self.assertTrue("cutegirlsarecute/yukinon.jpg" in fnames)
+        self.assertTrue("you/shall/pass/eruna.jpg" in fnames)
+
+    def test_nonlegitFromRootFolder(self):
+        fnames = tecafs.filesInFolder("tests/test_data/images", self.conf, deep=True)
+        self.assertFalse(self.starting_path+"/you/shall/notpass/kaiki.gif" in fnames)
