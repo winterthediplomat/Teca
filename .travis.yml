@@ -7,7 +7,7 @@ python:
   - "3.4"
   - "nightly"
 # command to install dependencies
-install: "pip install pip --upgrade ; pip install --upgrade .[test] -r requirements.txt"
+install: "pip install pip --upgrade ; pip install --upgrade .[test]"
 # command to run tests
 script:
   #- mkdir -p tests/test_data/images/emptyFolder
