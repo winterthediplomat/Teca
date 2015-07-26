@@ -1,0 +1,45 @@
+{
+    "paths":{
+      "cutegirlsarecute": { 
+      },
+      "you":{
+        "paths":{
+          "shall":{
+            "excluded_folders":["notpass"]
+          }
+        }
+      }
+    },
+    "excluded_folders": ["hiddenfolder"],
+    "excluded_files":["oops_you_should_not_see_it.png"],
+    "image_formats":[
+          "jpg"
+        , "tiff"
+        , "png"
+        , "bmp"
+    ],
+    "excluded_file_formats":[
+        "^thumb_",
+        "^cover_",
+        "^default_"
+    ],
+    "template_path": "templates/default.html",
+    "thumbnail_size": {
+        "width": 360,
+        "height": 240
+    },
+    "cover_size": {
+        "width": 640,
+        "height": 400
+    },
+    "regenerate_thumbnails": false,
+    "directories_on_a_row": 3,
+    "images_on_a_row": 3,
+    "default_image": "default_images/default_.jpg",
+    "short_links": {
+      "use_feature": true,
+      "short_url": "http://mysho.rt/url/",
+      "symlink_folder": "/home/lolwat/url/",
+      "links_database": "links.json"
+    }
+}

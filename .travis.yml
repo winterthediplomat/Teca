@@ -1,0 +1,15 @@
+language: python
+python:
+  #- "2.6" #it's just a non-working test in a context. will fix that soon.
+  - "2.7"
+  - "3.2"
+  - "3.3"
+  - "3.4"
+  - "nightly"
+# command to install dependencies
+install: "pip install pip --upgrade ; pip install --upgrade .[test]"
+# command to run tests
+script:
+  #- mkdir -p tests/test_data/images/emptyFolder
+  #- python setup.py test
+  - nosetests

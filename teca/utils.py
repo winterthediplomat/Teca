@@ -21,7 +21,6 @@ def handleCmd():
         "starting_path": os.path.abspath(args[0])
         }
 
-
 def filterImages(files, cfg):
     """this function just filter images using given image formats."""
     regex = "\.(" + "|".join(cfg.image_formats) + ")$"
