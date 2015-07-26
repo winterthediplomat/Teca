@@ -3,6 +3,8 @@ from six import next as _next
 import re
 import teca.utils as tecautils
 from collections import namedtuple
+import logging
+
 
 Directory = namedtuple("Directory", "path directories filenames")
 
@@ -37,6 +39,7 @@ def walk(starting_path, cfg, deep=False):
             deep_dirnames.extend([os.path.join(dirpath, dirname_) for dirname_ in dirnames])
             deep_filenames.extend([os.path.join(dirpath, filename_) for filename_ in filenames])
 
+    logging.debug("at_least_one_folder: {0}".format(at_least_one_folder))
     if not at_least_one_folder:
         yield Directory("", [], [])
     elif deep:
