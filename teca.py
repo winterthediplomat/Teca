@@ -17,6 +17,7 @@ from teca.ConfigHandler import ConfigHandler
 from teca.utils import handleCmd, filterImages
 import teca.generation
 import teca.filesystem
+import teca.shorturls
 import logging
 logging.basicConfig(format="%(levelname)s:%(funcName)s->%(lineno)d:%(message)s",
                     filemode="w",
@@ -33,19 +34,17 @@ def generateShortLinks(path, dirs, files, cfg):
     token = teca.generation.generateToken
 
     if cfg.is_plugin_enabled("short_links"):
-
-        with open(cfg.short_links.links_database) as links_file:
-            links = json.load(links_file)
-            for file_ in files:
-                fullpath = os.path.join(path, file_)
-                if fullpath not in links:
-                    code = token(links.values())
-                    os.symlink(os.path.join(cfg.short_links.symlink_folder, code), fullpath)
-                    links[fullpath] = code
-                else:  # fullpath in links
-                    if not os.path.exists(os.path.join(cfg.short_links.symlink_folder, links[fullpath])): #we need to recreate the token
-                        os.symlink(os.path.join(cfg.short_links.symlink_folder, links[fullpath]))
-        json.dump(links, open(cfg.short_links.links_database, "w"))
+        links = teca.shorturls.loadShortUrls(cfg)
+        for file_ in files:
+            fullpath = os.path.join(path, file_)
+            if fullpath not in links:
+                code = token(links.values())
+                os.symlink(os.path.join(cfg.short_links.symlink_folder, code), fullpath)
+                links[fullpath] = code
+            else:  # fullpath in links
+                if not os.path.exists(os.path.join(cfg.short_links.symlink_folder, links[fullpath])): #we need to recreate the token
+                    os.symlink(os.path.join(cfg.short_links.symlink_folder, links[fullpath]))
+        teca.shorturls.dumpShortUrls(links, cfg)
 
 def generateCovers(path, files, cfg):
     choose_image = teca.generation.chooseImage
@@ -68,7 +67,13 @@ def generateCovers(path, files, cfg):
         cover_obj = Image.open(os.path.join(os.path.abspath(""), filename))
 
     cover_obj.thumbnail(cfg.cover_size(path))
-    cover_obj.save(os.path.join(path, "cover_.png"))
+    
+    try:
+        cover_obj.save(os.path.join(path, "cover_.png"))
+    except IOError as e:
+        logging.error("could not generate {0}: {1}".format(
+          os.path.join(path, "cover_.png"), e)
+        )
 
 
 def generateThumbnails(path, files, cfg):
@@ -83,8 +88,8 @@ def generateThumbnails(path, files, cfg):
             thumbnail_obj.thumbnail(cfg.thumbnail_size(path))
             thumbnail_obj.save(os.path.join(path, "thumb_"+filename))
             logging.debug("generated thumbnail for {0}".format(full_filename))
-        except Exception as e:
-            logging.error("[Thumbnails]: error while generating thumbnail for {0}: {1}".format(full_filename, e))
+        except IOError as e:
+            logging.error("[Thumbnails]: I/O error while generating thumbnail for {0}: {1}".format(full_filename, e))
 
 
 def generateIndex(path, files, dirs, cfg):
